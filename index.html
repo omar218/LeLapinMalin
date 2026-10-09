@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Le Lapin Malin - Logiciel de Gestion d'Élevage Cunicole</title>
+  <meta name="description" content="Solution complète et intuitive pour la gestion d'une ferme de lapins : reproduction, cheptel, santé, clapiers et finances.">
+  <link rel="icon" type="image/jpeg" href="logo-lapin.jpg">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', var(--font-main);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================================
+       SIDEBAR NAVIGATION
+       ========================================================================= -->
+  <aside id="sidebar">
+    <div class="brand">
+      <div class="brand-icon">
+        <img src="logo-lapin.jpg" alt="Logo Le Lapin Malin" class="brand-logo-img">
+      </div>
+      <div class="brand-info">
+        <h1>Le Lapin Malin <span class="badge-pro">PRO</span></h1>
+        <p>Gestion Ferme Cunicole</p>
+      </div>
+    </div>
+
+    <ul class="nav-links">
+      <li>
+        <a class="nav-item active" data-tab="dashboard">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span>Tableau de Bord</span>
+        </a>
+      </li>
+      <li>
+        <a class="nav-item" data-tab="rabbits">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          <span>Cheptel (Lapins)</span>
+        </a>
+      </li>
+      <li>
+        <a class="nav-item" data-tab="breedings">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+          <span>Reproduction</span>
+          <span class="nav-badge" id="navBadgeBreeding" style="display:none;">0</span>
+        </a>
+      </li>
+      <li>
+        <a class="nav-item" data-tab="health">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          <span>Santé & Soins</span>
+        </a>
+      </li>
+      <li>
+        <a class="nav-item" data-tab="finances">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>Ventes & Dépenses</span>
+        </a>
+      </li>
+      <li>
+        <a class="nav-item" data-tab="stock">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+          <span>Stocks Aliments</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div class="farm-status" id="dbStatusBadge" title="Base de données locale IndexedDB active et permanente">
+        <span class="status-dot db-dot"></span>
+        <span id="dbStatusText">BDD Connectée</span>
+      </div>
+      <button class="btn-icon" id="btnThemeToggle" title="Changer de thème">
+        <span id="themeIcon">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- =========================================================================
+       MAIN WORKSPACE CONTENT
+       ========================================================================= -->
+  <main id="main-content">
+    <!-- Header supérieur -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <img src="logo-lapin.jpg" alt="Logo Le Lapin Malin" class="header-mini-logo">
+        <div class="page-title">
+          <h2 id="headerPageTitle">Tableau de Bord</h2>
+          <p id="headerPageSub">Vue d'ensemble de votre élevage cunicole</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn btn-secondary btn-sm" id="btnExportJson" title="Exporter les données">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span>Sauvegarder</span>
+        </button>
+        <label class="btn btn-secondary btn-sm" style="margin:0; cursor:pointer;" title="Importer un fichier de sauvegarde">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+          <span>Restaurer</span>
+          <input type="file" id="fileImportInput" accept=".json" style="display:none;">
+        </label>
+        <button class="btn btn-secondary btn-sm" id="btnResetDefault" title="Recharger les exemples">
+          <span>Exemples</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Zone principale -->
+    <div class="page-container">
+
+      <!-- =====================================================================
+           ONGLET 1 : TABLEAU DE BORD
+           ===================================================================== -->
+      <section class="tab-pane active" id="tab-dashboard">
+        <!-- Grille des métriques clés -->
+        <div class="kpi-grid">
+          <div class="kpi-card emerald">
+            <div class="kpi-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-value" id="kpiTotalRabbits">0</span>
+              <span class="kpi-label">Total Adultes & Lots</span>
+              <span class="kpi-subtext">Effectif enregistré</span>
+            </div>
+          </div>
+
+          <div class="kpi-card blue">
+            <div class="kpi-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-value" id="kpiMales">0</span>
+              <span class="kpi-label">Mâles Reproducteurs</span>
+              <span class="kpi-subtext">Mâles en activité</span>
+            </div>
+          </div>
+
+          <div class="kpi-card purple">
+            <div class="kpi-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-value" id="kpiFemales">0</span>
+              <span class="kpi-label">Femelles Mères</span>
+              <span class="kpi-subtext">Reproductrices</span>
+            </div>
+          </div>
+
+          <div class="kpi-card amber">
+            <div class="kpi-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-value" id="kpiPregnant">0</span>
+              <span class="kpi-label">Femelles Gestantes</span>
+              <span class="kpi-subtext">Mises bas à venir</span>
+            </div>
+          </div>
+
+          <div class="kpi-card rose">
+            <div class="kpi-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-value" id="kpiLitterKits">0</span>
+              <span class="kpi-label">Lapereaux au Nid</span>
+              <span class="kpi-subtext">En phase d'allaitement</span>
+            </div>
+          </div>
+
+          <div class="kpi-card emerald">
+            <div class="kpi-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-value" id="kpiFattening">0</span>
+              <span class="kpi-label">Lots Engraissement</span>
+              <span class="kpi-subtext">Croissance & Finition</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-columns">
+          <!-- Colonne gauche : Tâches & Alertes cunicoles prioritaires -->
+          <div class="dashboard-panel">
+            <div class="panel-header">
+              <h3>
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                <span>Actions & Alertes Cunicoles du Moment</span>
+              </h3>
+              <span style="font-size:0.75rem; color:var(--text-muted);">Calculé automatiquement</span>
+            </div>
+
+            <div class="alert-list" id="dashboardAlertsList">
+              <!-- Rempli dynamiquement -->
+            </div>
+          </div>
+
+          <!-- Colonne droite : Répartition & Actions rapides -->
+          <div>
+            <div class="dashboard-panel">
+              <div class="panel-header">
+                <h3>
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+                  <span>Répartition du Cheptel</span>
+                </h3>
+              </div>
+              <div id="chartCheptelSvg">
+                <!-- Rempli dynamiquement -->
+              </div>
+            </div>
+
+            <div class="dashboard-panel" style="background: linear-gradient(145deg, var(--bg-card), var(--bg-subtle));">
+              <div class="panel-header">
+                <h3>
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                  <span>Actions Rapides</span>
+                </h3>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn btn-primary" onclick="app.openBreedingModal()">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                  <span>Enregistrer une Saillie</span>
+                </button>
+                <button class="btn btn-secondary" onclick="app.openRabbitModal()">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                  <span>Ajouter un Lapin</span>
+                </button>
+                <button class="btn btn-secondary" onclick="app.openHealthModal()">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9"/></svg>
+                  <span>Noter un Soin / Vaccin</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           ONGLET 2 : CHEPTEL (GESTION DES LAPINS)
+           ===================================================================== -->
+      <section class="tab-pane" id="tab-rabbits">
+        <div class="table-toolbar">
+          <div class="search-box">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" id="searchRabbitInput" placeholder="Rechercher par nom, matricule, race, clapier...">
+          </div>
+
+          <div class="filter-group">
+            <select class="select-filter" id="filterSexSelect">
+              <option value="">Tous les sexes</option>
+              <option value="M">Mâles (♂)</option>
+              <option value="F">Femelles (♀)</option>
+            </select>
+
+            <select class="select-filter" id="filterStatusSelect">
+              <option value="">Tous les statuts</option>
+              <option value="Reproducteur">Reproducteur</option>
+              <option value="Gestante">Gestante</option>
+              <option value="Allaitante">Allaitante</option>
+              <option value="Repos">En repos</option>
+              <option value="Engraissement">Engraissement</option>
+              <option value="Vendu">Vendu</option>
+              <option value="Décédé">Décédé</option>
+            </select>
+
+            <button class="btn btn-primary" id="btnAddRabbit">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+              <span>Nouveau Lapin</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Matricule</th>
+                  <th>Nom / Tatouage</th>
+                  <th>Sexe</th>
+                  <th>Race</th>
+                  <th>Cage</th>
+                  <th>Naissance</th>
+                  <th>Poids</th>
+                  <th>Statut</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="rabbitsTableBody">
+                <!-- Rempli dynamiquement -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           ONGLET 3 : REPRODUCTION & PORTÉES
+           ===================================================================== -->
+      <section class="tab-pane" id="tab-breedings">
+        <div class="table-toolbar">
+          <div style="font-size:0.95rem; color:var(--text-muted);">
+            Cycle cunicole automatisé : Saillie ➔ Palpation (J+12) ➔ Boîte à nid (J+28) ➔ Mise bas (J+31) ➔ Sevrage (J+35)
+          </div>
+
+          <button class="btn btn-primary" id="btnAddBreeding">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+            <span>Nouvelle Saillie</span>
+          </button>
+        </div>
+
+        <div class="table-wrapper">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Femelle (Mère)</th>
+                  <th>Mâle (Père)</th>
+                  <th>Date Saillie</th>
+                  <th>Échéances Clés</th>
+                  <th>Statut du Cycle</th>
+                  <th>Bilan Portée</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="breedingsTableBody">
+                <!-- Rempli dynamiquement -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           ONGLET 4 : SANTÉ & CARNET VÉTÉRINAIRE
+           ===================================================================== -->
+      <section class="tab-pane" id="tab-health">
+        <div class="table-toolbar">
+          <div style="font-size:0.95rem; color:var(--text-muted);">
+            Suivi des vaccinations (Myxomatose, VHD1, VHD2), vermifugations et soins courants.
+          </div>
+
+          <div class="filter-group">
+            <select class="select-filter" id="filterHealthStatusSelect">
+              <option value="">Tous les soins</option>
+              <option value="Prévu">À faire / Prévus</option>
+              <option value="Effectué">Effectués</option>
+            </select>
+
+            <button class="btn btn-primary" id="btnAddHealth">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+              <span>Nouveau Soin / Vaccin</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Traitement / Soin</th>
+                  <th>Lapin concerné</th>
+                  <th>Type</th>
+                  <th>Statut</th>
+                  <th>Prochain Rappel</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="healthTableBody">
+                <!-- Rempli dynamiquement -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           ONGLET 5 : FINANCES & VENTES
+           ===================================================================== -->
+      <section class="tab-pane" id="tab-finances">
+        <div class="kpi-grid" style="margin-bottom: 20px;">
+          <div class="kpi-card emerald">
+            <div class="kpi-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-value" id="financeTotalIncome" style="color:var(--primary-600);">0.00 €</span>
+              <span class="kpi-label">Total Ventes / Recettes</span>
+            </div>
+          </div>
+
+          <div class="kpi-card rose">
+            <div class="kpi-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-value" id="financeTotalExpenses" style="color:var(--accent-rose);">0.00 €</span>
+              <span class="kpi-label">Total Dépenses & Achats</span>
+            </div>
+          </div>
+
+          <div class="kpi-card blue">
+            <div class="kpi-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-value" id="financeNetProfit">0.00 €</span>
+              <span class="kpi-label">Bénéfice Net</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-toolbar">
+          <div class="filter-group">
+            <select class="select-filter" id="filterFinanceTypeSelect">
+              <option value="">Toutes les opérations</option>
+              <option value="Vente">Ventes / Recettes (+)</option>
+              <option value="Dépense">Dépenses / Achats (-)</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" id="btnAddFinance">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+            <span>Nouvelle Transaction</span>
+          </button>
+        </div>
+
+        <div class="table-wrapper">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Catégorie</th>
+                  <th>Description</th>
+                  <th>Montant</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="financesTableBody">
+                <!-- Rempli dynamiquement -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           ONGLET 6 : STOCKS & ALIMENTATION
+           ===================================================================== -->
+      <section class="tab-pane" id="tab-stock">
+        <div class="kpi-grid" style="margin-bottom: 24px;">
+          <div class="kpi-card emerald">
+            <div class="kpi-icon">🌽</div>
+            <div class="kpi-info">
+              <span class="kpi-value" id="stockPelletsDisplay">0 kg</span>
+              <span class="kpi-label">Granulés Reproducteurs / Engraissement</span>
+            </div>
+          </div>
+
+          <div class="kpi-card amber">
+            <div class="kpi-icon">🌾</div>
+            <div class="kpi-info">
+              <span class="kpi-value" id="stockHayDisplay">0 kg</span>
+              <span class="kpi-label">Foin de Prairie / Luzerne</span>
+            </div>
+          </div>
+
+          <div class="kpi-card purple">
+            <div class="kpi-icon">📦</div>
+            <div class="kpi-info">
+              <span class="kpi-value" id="stockStrawDisplay">0 kg</span>
+              <span class="kpi-label">Paille & Copeaux pour nids</span>
+            </div>
+          </div>
+
+          <div class="kpi-card blue">
+            <div class="kpi-icon">⏳</div>
+            <div class="kpi-info">
+              <span class="kpi-value" id="stockAutonomyDays">0 jours</span>
+              <span class="kpi-label">Autonomie estimée en granulés</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-panel" style="max-width: 600px;">
+          <div class="panel-header">
+            <h3>Mise à jour des stocks actuels</h3>
+          </div>
+          <form id="stockForm" onsubmit="event.preventDefault(); app.handleSaveStock();">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Stock Granulés (kg)</label>
+                <input type="number" step="0.5" id="inputStockPellets" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Stock Foin (kg)</label>
+                <input type="number" step="0.5" id="inputStockHay" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Stock Paille & Litière (kg)</label>
+                <input type="number" step="0.5" id="inputStockStraw" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Consommation journalière globale (kg/jour)</label>
+                <input type="number" step="0.1" id="inputDailyConsumption" class="form-control" required>
+              </div>
+            </div>
+            <div style="margin-top: 18px; text-align: right;">
+              <button type="submit" class="btn btn-primary">Enregistrer les stocks</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       MODALES D'ACTIONS
+       ========================================================================= -->
+
+  <!-- Modale Ajout / Modification Lapin -->
+  <div class="modal-backdrop" id="rabbitModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalRabbitTitle">Ajouter un Lapin au Cheptel</h3>
+        <button class="btn-icon" data-close-modal title="Fermer">✕</button>
+      </div>
+      <form id="rabbitForm">
+        <input type="hidden" id="rabbitEditId">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Matricule / Boucle *</label>
+              <input type="text" id="rabbitIdInput" class="form-control" placeholder="ex: LPN-007" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nom d'usage / Tatouage *</label>
+              <input type="text" id="rabbitNameInput" class="form-control" placeholder="ex: Pompon" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Sexe *</label>
+              <select id="rabbitSexInput" class="form-control" required>
+                <option value="F">Femelle (♀)</option>
+                <option value="M">Mâle (♂)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Race *</label>
+              <input type="text" id="rabbitBreedInput" class="form-control" list="breedSuggestions" placeholder="ex: Fauve de Bourgogne" required>
+              <datalist id="breedSuggestions">
+                <option value="Fauve de Bourgogne">
+                <option value="Néo-Zélandais Blanc">
+                <option value="Californien">
+                <option value="Géant des Flandres">
+                <option value="Papillon Français">
+                <option value="Argenté de Champagne">
+                <option value="Bélier Français">
+                <option value="Croisé Local">
+              </datalist>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cage / Emplacement Clapier *</label>
+              <input type="text" id="rabbitCageInput" class="form-control" placeholder="ex: C-06" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date de Naissance</label>
+              <input type="date" id="rabbitBirthInput" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Poids actuel (kg)</label>
+              <input type="number" step="0.05" id="rabbitWeightInput" class="form-control" placeholder="ex: 4.25">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Statut Actuel</label>
+              <select id="rabbitStatusInput" class="form-control">
+                <option value="Reproducteur">Reproducteur</option>
+                <option value="Gestante">Gestante</option>
+                <option value="Allaitante">Allaitante</option>
+                <option value="Repos">En repos</option>
+                <option value="Engraissement">Engraissement</option>
+                <option value="Vendu">Vendu</option>
+                <option value="Décédé">Décédé</option>
+              </select>
+            </div>
+            <div class="form-group span-2">
+              <label class="form-label">Notes, Généalogie & Particularités</label>
+              <textarea id="rabbitNotesInput" class="form-control" placeholder="Origine, comportement maternel, observations..."></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>Annuler</button>
+          <button type="submit" class="btn btn-primary">Enregistrer le Lapin</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modale Nouvelle Saillie -->
+  <div class="modal-backdrop" id="breedingModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Enregistrer une Nouvelle Saillie</h3>
+        <button class="btn-icon" data-close-modal title="Fermer">✕</button>
+      </div>
+      <form id="breedingForm">
+        <input type="hidden" id="breedingIdInput">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Femelle (Mère) *</label>
+              <select id="breedingFemaleSelect" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mâle Reproducteur *</label>
+              <select id="breedingMaleSelect" class="form-control" required></select>
+            </div>
+            <div class="form-group span-2">
+              <label class="form-label">Date de la saillie *</label>
+              <input type="date" id="breedingDateInput" class="form-control" required>
+            </div>
+            <div class="form-group span-2">
+              <label class="form-label">Notes & Observations</label>
+              <textarea id="breedingNotesInput" class="form-control" placeholder="Nombre de chevauchements, comportement..."></textarea>
+            </div>
+          </div>
+          <div style="background:var(--primary-50); border:1px solid var(--primary-200); border-radius:8px; padding:12px; font-size:0.8rem; color:var(--primary-900);">
+            💡 <strong>Rappels automatiques programmés :</strong><br>
+            • Palpation : à 12 jours<br>
+            • Boîte à nid : à 28 jours<br>
+            • Mise bas estimée : à 31 jours<br>
+            • Sevrage : à 35 jours de lactation
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>Annuler</button>
+          <button type="submit" class="btn btn-primary">Créer le Cycle de Saillie</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modale Mise à jour Cycle / Mise Bas -->
+  <div class="modal-backdrop" id="updateBreedingModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="updateBreedingTitle">Mise à jour du Cycle</h3>
+        <button class="btn-icon" data-close-modal title="Fermer">✕</button>
+      </div>
+      <form onsubmit="event.preventDefault(); app.handleSaveCycleUpdate();">
+        <input type="hidden" id="updateBreedingId">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group span-2">
+              <label class="form-label">Statut du Cycle *</label>
+              <select id="updateStatusSelect" class="form-control" required>
+                <option value="En attente palpation">En attente palpation (J+12)</option>
+                <option value="Gestante">Gestante confirmée (Palpation positive)</option>
+                <option value="Mise bas effectuée">Mise bas effectuée (Lapereaux au nid)</option>
+                <option value="Sevrage terminé">Sevrage terminé (Portée détachée)</option>
+                <option value="Échec / Non gestante">Échec / Non gestante</option>
+              </select>
+            </div>
+            <div class="form-group span-2">
+              <label class="form-label">Date réelle de Mise bas (si effectuée)</label>
+              <input type="date" id="updateBirthDateInput" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nés vivants</label>
+              <input type="number" id="updateBornAliveInput" min="0" max="25" class="form-control" placeholder="ex: 8">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Morts-nés</label>
+              <input type="number" id="updateStillBornInput" min="0" max="10" class="form-control" value="0">
+            </div>
+            <div class="form-group span-2">
+              <label class="form-label">Nombre de lapereaux sevrés (à renseigner au sevrage)</label>
+              <input type="number" id="updateWeanedInput" min="0" max="25" class="form-control" placeholder="ex: 7">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>Annuler</button>
+          <button type="submit" class="btn btn-primary">Valider la Mise à Jour</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modale Soin / Santé -->
+  <div class="modal-backdrop" id="healthModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Enregistrer un Soin ou Traitement</h3>
+        <button class="btn-icon" data-close-modal title="Fermer">✕</button>
+      </div>
+      <form id="healthForm">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group span-2">
+              <label class="form-label">Lapin cible *</label>
+              <select id="healthRabbitSelect" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Type d'intervention *</label>
+              <select id="healthTypeSelect" class="form-control" required>
+                <option value="Vaccination">Vaccination (Myxo / VHD)</option>
+                <option value="Vermifuge">Vermifuge</option>
+                <option value="Anticoccidien">Anticoccidien</option>
+                <option value="Antibiotique">Antibiotique / Traitement</option>
+                <option value="Vitamine">Vitamines & Minéraux</option>
+                <option value="Gale / Parasites">Traitement Gale / Parasites</option>
+                <option value="Autre Soin">Autre Soin</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nom du Produit / Traitement *</label>
+              <input type="text" id="healthTreatmentInput" class="form-control" placeholder="ex: Vaccin Filavac VHD" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date d'administration *</label>
+              <input type="date" id="healthDateInput" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date du prochain rappel (optionnel)</label>
+              <input type="date" id="healthNextDateInput" class="form-control">
+            </div>
+            <div class="form-group span-2">
+              <label class="form-label">Statut</label>
+              <select id="healthStatusSelect" class="form-control">
+                <option value="Effectué">Effectué</option>
+                <option value="Prévu">Prévu (Rappel / À venir)</option>
+              </select>
+            </div>
+            <div class="form-group span-2">
+              <label class="form-label">Posologie & Notes</label>
+              <textarea id="healthNotesInput" class="form-control" placeholder="Dose administrée, voie d'injection ou dans l'eau de boisson..."></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>Annuler</button>
+          <button type="submit" class="btn btn-primary">Enregistrer le Soin</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modale Finance / Vente -->
+  <div class="modal-backdrop" id="financeModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Nouvelle Opération Financière</h3>
+        <button class="btn-icon" data-close-modal title="Fermer">✕</button>
+      </div>
+      <form id="financeForm">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Type d'opération *</label>
+              <select id="financeTypeSelect" class="form-control" required>
+                <option value="Vente">Vente / Recette (+)</option>
+                <option value="Dépense">Dépense / Achat (-)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Montant (€) *</label>
+              <input type="number" step="0.5" id="financeAmountInput" class="form-control" placeholder="ex: 50.00" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date *</label>
+              <input type="date" id="financeDateInput" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Catégorie *</label>
+              <input type="text" id="financeCategoryInput" class="form-control" list="catSuggestions" placeholder="ex: Vente Lapin de Chair" required>
+              <datalist id="catSuggestions">
+                <option value="Vente Lapins de Chair">
+                <option value="Vente Reproducteur">
+                <option value="Alimentation (Granulés)">
+                <option value="Fourrage & Foin">
+                <option value="Litière & Paille">
+                <option value="Médicaments & Vaccins">
+                <option value="Matériel & Clapiers">
+              </datalist>
+            </div>
+            <div class="form-group span-2">
+              <label class="form-label">Description / Détails</label>
+              <input type="text" id="financeDescInput" class="form-control" placeholder="ex: Vente de 2 femelles reproductrices">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>Annuler</button>
+          <button type="submit" class="btn btn-primary">Enregistrer la Transaction</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Zone invisible dédiée à l'impression propre de fiche de clapier -->
+  <div id="printable-card-area"></div>
+
+  <!-- Conteneur de Notifications Toasts -->
+  <div id="toast-container"></div>
+
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
