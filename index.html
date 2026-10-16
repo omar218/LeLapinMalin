@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Le Lapin Malin - Logiciel de Gestion d'Élevage Cunicole</title>
+  <title>Le Lapin Malin - Logiciel de gestion d'une ferme Cunicole</title>
   <meta name="description" content="Solution complète et intuitive pour la gestion d'une ferme de lapins : reproduction, cheptel, santé, clapiers et finances.">
   <link rel="icon" type="image/jpeg" href="logo-lapin.jpg">
   <link rel="stylesheet" href="styles.css">
@@ -27,7 +27,7 @@
         <img src="logo-lapin.jpg" alt="Logo Le Lapin Malin" class="brand-logo-img">
       </div>
       <div class="brand-info">
-        <h1>Le Lapin Malin <span class="badge-pro">PRO</span></h1>
+        <h1>REGISTRE DE FERME CUNICOLE <span class="badge-pro">PRO</span></h1>
         <p>Gestion Ferme Cunicole</p>
       </div>
     </div>
@@ -42,32 +42,63 @@
       <li>
         <a class="nav-item" data-tab="rabbits">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-          <span>Cheptel (Lapins)</span>
+          <span>Reproducteurs</span>
         </a>
       </li>
-      <li>
-        <a class="nav-item" data-tab="breedings">
-          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-          <span>Reproduction</span>
-          <span class="nav-badge" id="navBadgeBreeding" style="display:none;">0</span>
-        </a>
-      </li>
-      <li>
+        <li>
         <a class="nav-item" data-tab="health">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-          <span>Santé & Soins</span>
+          <span>Sanitaire</span>
         </a>
       </li>
-      <li>
+        <li>
+        <a class="nav-item" data-tab="finances">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>Stocks-Alimentations</span>
+        </a>
+      </li>
+
+        <li>
+        <a class="nav-item" data-tab="finances">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>Batiments et clapets </span>
+        </a>
+      </li>
+
+        <li>
+        <a class="nav-item" data-tab="stock">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+          <span>Production</span>
+        </a>
+      </li>
+
+       <li>
+        <a class="nav-item" data-tab="finances">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>Rapports</span>
+        </a>
+      </li>
+       <li>
         <a class="nav-item" data-tab="finances">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           <span>Ventes & Dépenses</span>
         </a>
       </li>
-      <li>
-        <a class="nav-item" data-tab="stock">
-          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-          <span>Stocks Aliments</span>
+
+
+       
+        <li>
+        <a class="nav-item" data-tab="finances">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>Membres</span>
+        </a>
+      </li>
+       
+    
+        <li>
+        <a class="nav-item" data-tab="finances">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>Abonnements</span>
         </a>
       </li>
     </ul>
@@ -178,7 +209,7 @@
             <div class="kpi-info">
               <span class="kpi-value" id="kpiLitterKits">0</span>
               <span class="kpi-label">Lapereaux au Nid</span>
-              <span class="kpi-subtext">En phase d'allaitement</span>
+              <span class="kpi-subtext">En phase d'engraissement</span>
             </div>
           </div>
 
@@ -189,7 +220,6 @@
             <div class="kpi-info">
               <span class="kpi-value" id="kpiFattening">0</span>
               <span class="kpi-label">Lots Engraissement</span>
-              <span class="kpi-subtext">Croissance & Finition</span>
             </div>
           </div>
         </div>
@@ -275,7 +305,7 @@
               <option value="Repos">En repos</option>
               <option value="Engraissement">Engraissement</option>
               <option value="Vendu">Vendu</option>
-              <option value="Décédé">Décédé</option>
+              <option value="Décédé">Mortalite</option>
             </select>
 
             <button class="btn btn-primary" id="btnAddRabbit">
@@ -298,6 +328,7 @@
                   <th>Naissance</th>
                   <th>Poids</th>
                   <th>Statut</th>
+                   <th>Date de naissance</th>
                   <th style="text-align: right;">Actions</th>
                 </tr>
               </thead>
@@ -393,7 +424,7 @@
       </section>
 
       <!-- =====================================================================
-           ONGLET 5 : FINANCES & VENTES
+           ONGLET 5 : VENTES ET DEPENSES
            ===================================================================== -->
       <section class="tab-pane" id="tab-finances">
         <div class="kpi-grid" style="margin-bottom: 20px;">
@@ -402,7 +433,7 @@
               <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
             </div>
             <div class="kpi-info">
-              <span class="kpi-value" id="financeTotalIncome" style="color:var(--primary-600);">0.00 €</span>
+              <span class="kpi-value" id="financeTotalIncome" style="color:var(--primary-600);">0.00 FCFA</span>
               <span class="kpi-label">Total Ventes / Recettes</span>
             </div>
           </div>
@@ -412,7 +443,7 @@
               <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/></svg>
             </div>
             <div class="kpi-info">
-              <span class="kpi-value" id="financeTotalExpenses" style="color:var(--accent-rose);">0.00 €</span>
+              <span class="kpi-value" id="financeTotalExpenses" style="color:var(--accent-rose);">0.00 FCFA</span>
               <span class="kpi-label">Total Dépenses & Achats</span>
             </div>
           </div>
@@ -422,7 +453,7 @@
               <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/></svg>
             </div>
             <div class="kpi-info">
-              <span class="kpi-value" id="financeNetProfit">0.00 €</span>
+              <span class="kpi-value" id="financeNetProfit">0.00 FCFA</span>
               <span class="kpi-label">Bénéfice Net</span>
             </div>
           </div>
@@ -599,7 +630,7 @@
                 <option value="Repos">En repos</option>
                 <option value="Engraissement">Engraissement</option>
                 <option value="Vendu">Vendu</option>
-                <option value="Décédé">Décédé</option>
+                <option value="Décédé">Mortalite</option>
               </select>
             </div>
             <div class="form-group span-2">
@@ -646,10 +677,12 @@
           </div>
           <div style="background:var(--primary-50); border:1px solid var(--primary-200); border-radius:8px; padding:12px; font-size:0.8rem; color:var(--primary-900);">
             💡 <strong>Rappels automatiques programmés :</strong><br>
-            • Palpation : à 12 jours<br>
+            • Palpation : à 15 jours<br>
+            •  Cycle de Sallit : à 32 jours<br>
             • Boîte à nid : à 28 jours<br>
             • Mise bas estimée : à 31 jours<br>
-            • Sevrage : à 35 jours de lactation
+            • Sevrage : à 35 jours 
+            
           </div>
         </div>
         <div class="modal-footer">
@@ -784,7 +817,7 @@
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Montant (€) *</label>
+              <label class="form-label">Montant FCFA *</label>
               <input type="number" step="0.5" id="financeAmountInput" class="form-control" placeholder="ex: 50.00" required>
             </div>
             <div class="form-group">
