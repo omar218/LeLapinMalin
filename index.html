@@ -15,13 +15,87 @@
       font-family: 'Plus Jakarta Sans', var(--font-main);
     }
   </style>
+  <script>
+    try {
+      const savedTheme = localStorage.getItem('lelapinmalin_theme_preference');
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      }
+    } catch (error) {
+      console.warn('Impossible de charger la préférence de thème :', error);
+    }
+  </script>
 </head>
 <body>
+
+  <section class="auth-screen" id="authScreen" aria-labelledby="authTitle">
+    <div class="auth-shell">
+      <header class="auth-brand">
+        <img src="logo-lapin.jpg" alt="" class="auth-logo">
+        <span>Le Lapin Malin</span>
+        <button class="auth-theme-toggle" id="authThemeToggle" type="button" aria-label="Activer le thème sombre" title="Activer le thème sombre">
+          <span id="authThemeIcon" aria-hidden="true">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+          </span>
+        </button>
+      </header>
+
+      <div class="auth-layout">
+        <div class="auth-intro">
+          <span class="auth-eyebrow">VOTRE ÉLEVAGE, EN TOUTE SIMPLICITÉ</span>
+          <h1>Une ferme bien suivie, des décisions plus sereines.</h1>
+          <p>Retrouvez au même endroit le suivi de vos lapins, de la reproduction, de la santé et de vos stocks.</p>
+          <ul class="auth-benefits">
+            <li><span aria-hidden="true">✓</span> Suivez votre cheptel au quotidien</li>
+            <li><span aria-hidden="true">✓</span> Gardez un œil sur les soins et les échéances</li>
+            <li><span aria-hidden="true">✓</span> Retrouvez vos données sur vos appareils</li>
+          </ul>
+        </div>
+
+        <div class="auth-card">
+          <div class="auth-tabs" role="tablist" aria-label="Choisir une action">
+            <button class="auth-tab active" id="loginTab" type="button" role="tab" aria-selected="true" aria-controls="authForm" data-auth-mode="login">Connexion</button>
+            <button class="auth-tab" id="registerTab" type="button" role="tab" aria-selected="false" aria-controls="authForm" data-auth-mode="register">Inscription</button>
+          </div>
+
+          <div class="auth-card-heading">
+            <h2 id="authTitle">Heureux de vous revoir</h2>
+            <p id="authSubtitle">Connectez-vous pour retrouver votre espace.</p>
+          </div>
+
+          <form id="authForm" class="auth-form" novalidate>
+            <div class="auth-field" id="authNameField" hidden>
+              <label for="authName">Nom complet</label>
+              <input id="authName" name="name" type="text" autocomplete="name" placeholder="Ex. Amina Diallo">
+            </div>
+            <div class="auth-field">
+              <label for="authEmail">Adresse e-mail</label>
+              <input id="authEmail" name="email" type="email" autocomplete="email" placeholder="vous@exemple.com" required>
+            </div>
+            <div class="auth-field">
+              <label for="authPassword">Mot de passe</label>
+              <input id="authPassword" name="password" type="password" autocomplete="current-password" placeholder="8 caractères minimum" minlength="8" required>
+            </div>
+            <div class="auth-field" id="authConfirmField" hidden>
+              <label for="authConfirmPassword">Confirmer le mot de passe</label>
+              <input id="authConfirmPassword" name="confirmPassword" type="password" autocomplete="new-password" placeholder="Répétez votre mot de passe" minlength="8">
+            </div>
+            <p class="auth-message" id="authMessage" role="status" aria-live="polite" hidden></p>
+            <button class="auth-submit" id="authSubmit" type="submit">Se connecter</button>
+          </form>
+
+          <div class="auth-footer">
+            <p>En utilisant ce logiciel, vous acceptez les <a href="#">conditions d'utilisation</a> et la <a href="#">politique de confidentialité</a>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- =========================================================================
        SIDEBAR NAVIGATION
        ========================================================================= -->
-  <aside id="sidebar">
+  <aside id="sidebar" inert aria-hidden="true">
     <div class="brand">
       <div class="brand-icon">
         <img src="logo-lapin.jpg" alt="Logo Le Lapin Malin" class="brand-logo-img">
@@ -104,6 +178,11 @@
     </ul>
 
     <div class="sidebar-footer">
+      <div class="account-session" id="accountSession">
+        <span class="account-session-label">Session active</span>
+        <span class="account-session-email" id="accountSessionEmail"></span>
+        <button class="account-signout" id="btnSignOut" type="button">Se déconnecter</button>
+      </div>
       <div class="farm-status" id="dbStatusBadge" title="Base de données locale IndexedDB active et permanente">
         <span class="status-dot db-dot"></span>
         <span id="dbStatusText">Connectée</span>
@@ -115,15 +194,16 @@
       </button>
     </div>
   </aside>
+  <button class="sidebar-backdrop" id="sidebarBackdrop" type="button" aria-label="Fermer le menu"></button>
 
   <!-- =========================================================================
        MAIN WORKSPACE CONTENT
        ========================================================================= -->
-  <main id="main-content">
+  <main id="main-content" inert aria-hidden="true">
     <!-- Header supérieur -->
     <header class="top-header">
       <div class="header-left">
-        <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Ouvrir le menu" aria-controls="sidebar" aria-expanded="false">
           <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
         <img src="logo-lapin.jpg" alt="Logo Le Lapin Malin" class="header-mini-logo">
@@ -138,14 +218,14 @@
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           <span>Sauvegarder</span>
         </button>
-        <label class="btn btn-secondary btn-sm" style="margin:0; cursor:pointer;" title="Importer un fichier de sauvegarde">
+        <!-- <label class="btn btn-secondary btn-sm" style="margin:0; cursor:pointer;" title="Importer un fichier de sauvegarde">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
           <span>Restaurer</span>
           <input type="file" id="fileImportInput" accept=".json" style="display:none;">
-        </label>
-        <button class="btn btn-secondary btn-sm" id="btnResetDefault" title="Recharger les exemples">
+        </label> -->
+        <!-- <button class="btn btn-secondary btn-sm" id="btnResetDefault" title="Recharger les exemples">
           <span>Exemples</span>
-        </button>
+        </button> -->
       </div>
     </header>
 
@@ -243,12 +323,7 @@
           <!-- Colonne droite : Répartition & Actions rapides -->
           <div>
             <div class="dashboard-panel">
-              <div class="panel-header">
-                <h3>
-                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
-                  <span>Répartition du Cheptel</span>
-                </h3>
-              </div>
+
               <div id="chartCheptelSvg">
                 <!-- Rempli dynamiquement -->
               </div>
@@ -258,7 +333,7 @@
               <div class="panel-header">
                 <h3>
                   <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                  <span>Actions Rapides</span>
+                  <span>Actions importantes</span>
                 </h3>
               </div>
               <div style="display: flex; flex-direction: column; gap: 10px;">
@@ -293,8 +368,8 @@
           <div class="filter-group">
             <select class="select-filter" id="filterSexSelect">
               <option value="">Tous les sexes</option>
-              <option value="M">Mâles (♂)</option>
-              <option value="F">Femelles (♀)</option>
+              <option value="M">Mâles</option>
+              <option value="F">Femelles</option>
             </select>
 
             <select class="select-filter" id="filterStatusSelect">
@@ -858,6 +933,9 @@
   <div id="toast-container"></div>
 
   <script src="db.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
   <script src="app.js"></script>
+  <script src="auth.js"></script>
 </body>
 </html>

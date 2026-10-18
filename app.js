@@ -218,16 +218,22 @@ function formatDateFr(dateStr) {
 // Classe de gestion principale
 class LeLapinMalinApp {
   constructor() {
+    const userId = window.authManager?.currentUser?.id;
+    this.storageKey = userId ? `lelapinmalin_data_v1_${userId}` : 'lelapinmalin_data_v1';
     this.db = window.dbManager || new LeLapinMalinDB();
     this.state = this.loadState();
     this.currentTab = 'dashboard';
+    this.cloudSyncEnabled = false;
+    this.cloudSaveTimer = null;
+    this.cloudSaveFailed = false;
     this.init();
-    this.initDatabase();
+    this.initialization = this.initDatabase();
   }
 
   loadState() {
     try {
-      const stored = localStorage.getItem('lelapinmalin_data_v1') || localStorage.getItem('cunigest_data_v1');
+      const stored = localStorage.getItem(this.storageKey) ||
+        (!window.authManager?.currentUser && localStorage.getItem('cunigest_data_v1'));
       if (stored) {
         return JSON.parse(stored);
       }
@@ -239,57 +245,98 @@ class LeLapinMalinApp {
 
   async initDatabase() {
     try {
+      const user = window.authManager?.currentUser;
+      const supabase = window.authManager?.client;
+      let cloudState = null;
+
+      if (user && supabase) {
+        const { data, error } = await supabase
+          .from('farm_data')
+          .select('data')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if (error) throw error;
+
+        if (data) {
+          const savedState = data.data;
+          if (!savedState || !Array.isArray(savedState.rabbits)) {
+            throw new Error('Le contenu enregistré dans farm_data est invalide.');
+          }
+          cloudState = {
+            ...JSON.parse(JSON.stringify(DEFAULT_STATE)),
+            ...savedState,
+            rabbits: savedState.rabbits,
+            breedings: Array.isArray(savedState.breedings) ? savedState.breedings : [],
+            healthLogs: Array.isArray(savedState.healthLogs) ? savedState.healthLogs : [],
+            finances: Array.isArray(savedState.finances) ? savedState.finances : [],
+            feedStock: savedState.feedStock || DEFAULT_STATE.feedStock
+          };
+          this.state = cloudState;
+        }
+      }
+
       if (this.db) {
         await this.db.init();
         if (this.db.isReady) {
-          // Vérifier si la base de données IndexedDB contient déjà des données enregistrées
-          const dbRabbits = await this.db.getAll('rabbits');
-          if (dbRabbits && dbRabbits.length > 0) {
-            // Charger l'état depuis la base de données
-            const breedings = await this.db.getAll('breedings');
-            const healthLogs = await this.db.getAll('healthLogs');
-            const finances = await this.db.getAll('finances');
-            const feedStockRecord = await this.db.get('feedStock', 'current');
-            const themeRecord = await this.db.get('settings', 'theme');
-
-            this.state = {
-              theme: themeRecord ? themeRecord.value : (this.state.theme || 'light'),
-              rabbits: dbRabbits,
-              breedings: breedings || [],
-              healthLogs: healthLogs || [],
-              finances: finances || [],
-              feedStock: feedStockRecord ? feedStockRecord.data : (this.state.feedStock || DEFAULT_STATE.feedStock)
-            };
-
-            // Mirror synchrone
-            try {
-              localStorage.setItem('lelapinmalin_data_v1', JSON.stringify(this.state));
-            } catch (e) {}
-
-            this.applyTheme(this.state.theme);
-            this.refreshAll();
+          if (cloudState) {
+            await this.db.importFullDatabase(cloudState);
           } else {
-            // Première initialisation : peupler IndexedDB avec les données existantes ou par défaut
-            await this.db.importFullDatabase(this.state);
+            const dbRabbits = await this.db.getAll('rabbits');
+            if (dbRabbits && dbRabbits.length > 0) {
+              const breedings = await this.db.getAll('breedings');
+              const healthLogs = await this.db.getAll('healthLogs');
+              const finances = await this.db.getAll('finances');
+              const feedStockRecord = await this.db.get('feedStock', 'current');
+              const themeRecord = await this.db.get('settings', 'theme');
+
+              this.state = {
+                theme: themeRecord ? themeRecord.value : (this.state.theme || 'light'),
+                rabbits: dbRabbits,
+                breedings: breedings || [],
+                healthLogs: healthLogs || [],
+                finances: finances || [],
+                feedStock: feedStockRecord ? feedStockRecord.data : (this.state.feedStock || DEFAULT_STATE.feedStock)
+              };
+            } else {
+              await this.db.importFullDatabase(this.state);
+            }
           }
 
           const badgeText = document.getElementById('dbStatusText');
           const badgeContainer = document.getElementById('dbStatusBadge');
-          if (badgeText) badgeText.textContent = 'BDD Active (IndexedDB)';
-          if (badgeContainer) badgeContainer.title = 'Base de données IndexedDB connectée, transactionnelle et permanente';
+          if (badgeText) badgeText.textContent = user ? 'Cloud + stockage local' : 'BDD Active (IndexedDB)';
+          if (badgeContainer) {
+            badgeContainer.title = user
+              ? 'Données synchronisées avec Supabase et mises en cache dans IndexedDB'
+              : 'Base de données IndexedDB connectée, transactionnelle et permanente';
+          }
         }
       }
+
+      try {
+        localStorage.setItem(this.storageKey, JSON.stringify(this.state));
+      } catch (error) {
+        console.warn('Erreur de mise en cache locale:', error);
+      }
+
+      this.cloudSyncEnabled = Boolean(user && supabase);
+      window.addEventListener('online', () => {
+        if (this.cloudSyncEnabled) void this.syncStateToCloud();
+      });
+      this.applyTheme(this.state.theme || 'light');
+      this.refreshAll();
     } catch (err) {
-      console.warn('Initialisation base de données:', err);
+      console.error('Initialisation de la base de données impossible:', err);
       const badgeText = document.getElementById('dbStatusText');
-      if (badgeText) badgeText.textContent = 'Stockage Local (Secours)';
+      if (badgeText) badgeText.textContent = 'Erreur de synchronisation';
+      throw err;
     }
   }
 
   saveState() {
     // 1. Sauvegarde locale synchrone immédiate (miroir)
     try {
-      localStorage.setItem('lelapinmalin_data_v1', JSON.stringify(this.state));
+      localStorage.setItem(this.storageKey, JSON.stringify(this.state));
     } catch (e) {
       console.warn('Erreur localStorage:', e);
     }
@@ -299,6 +346,33 @@ class LeLapinMalinApp {
       this.db.importFullDatabase(this.state).catch(err => {
         console.error('Erreur persistance IndexedDB:', err);
       });
+    }
+
+    if (this.cloudSyncEnabled) {
+      clearTimeout(this.cloudSaveTimer);
+      this.cloudSaveTimer = setTimeout(() => this.syncStateToCloud(), 500);
+    }
+  }
+
+  async syncStateToCloud() {
+    const user = window.authManager?.currentUser;
+    const supabase = window.authManager?.client;
+    if (!this.cloudSyncEnabled || !user || !supabase) return;
+
+    try {
+      const { error } = await supabase.from('farm_data').upsert({
+        user_id: user.id,
+        data: this.state,
+        updated_at: new Date().toISOString()
+      });
+      if (error) throw error;
+      this.cloudSaveFailed = false;
+    } catch (error) {
+      console.error('Synchronisation Supabase impossible:', error);
+      if (!this.cloudSaveFailed) {
+        this.showToast('Synchronisation cloud impossible. Vérifiez votre connexion.', 'warning');
+      }
+      this.cloudSaveFailed = true;
     }
   }
 
@@ -320,8 +394,19 @@ class LeLapinMalinApp {
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
     if (mobileMenuBtn && sidebar) {
-      mobileMenuBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
+      const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+      const setSidebarOpen = (isOpen) => {
+        sidebar.classList.toggle('open', isOpen);
+        mobileMenuBtn.setAttribute('aria-expanded', String(isOpen));
+        mobileMenuBtn.setAttribute('aria-label', isOpen ? 'Fermer le menu' : 'Ouvrir le menu');
+      };
+      mobileMenuBtn.addEventListener('click', () => setSidebarOpen(!sidebar.classList.contains('open')));
+      sidebarBackdrop?.addEventListener('click', () => setSidebarOpen(false));
+      sidebar?.querySelectorAll('.nav-item').forEach((item) => {
+        item.addEventListener('click', () => setSidebarOpen(false));
+      });
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) setSidebarOpen(false);
       });
     }
 
@@ -395,6 +480,7 @@ class LeLapinMalinApp {
   applyTheme(theme) {
     this.state.theme = theme;
     document.documentElement.setAttribute('data-theme', theme);
+    window.authManager?.setTheme(theme);
     const themeIcon = document.getElementById('themeIcon');
     if (themeIcon) {
       themeIcon.innerHTML = theme === 'dark'
@@ -1565,6 +1651,18 @@ class LeLapinMalinApp {
 // Initialisation globale
 let app;
 window.addEventListener('DOMContentLoaded', () => {
-  app = new LeLapinMalinApp();
-  window.app = app;
+  const startApp = async (user) => {
+    if (user) {
+      window.dbManager = new LeLapinMalinDB(`LeLapinMalin_DB_${user.id}`);
+    }
+    app = new LeLapinMalinApp();
+    window.app = app;
+    await app.initialization;
+  };
+
+  if (window.authManager) {
+    window.authManager.setAppInitializer(startApp);
+  } else {
+    void startApp();
+  }
 });

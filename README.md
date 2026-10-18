@@ -40,25 +40,36 @@
 - Réserves en kg : granulés, foin, paille pour les nids.
 - Calcul automatique des **jours d'autonomie** restants selon la consommation journalière de votre cheptel.
 
-### 7. 🗄️ Base de Données Transactionnelle (IndexedDB) & Sécurité
-- **Base de Données Locale Dédiée** : Vos données sont structurées et stockées dans une véritable base de données transactionnelle standardisée W3C (**IndexedDB : `LeLapinMalin_DB`**), avec des tables séparées pour le cheptel (`rabbits`), les saillies (`breedings`), le carnet de santé (`healthLogs`), les finances (`finances`), les stocks (`feedStock`) et la configuration (`settings`).
-- **Persistance Garantie** : Demande d'autorisation de persistance permanente au navigateur (`navigator.storage.persist()`) pour prévenir toute suppression automatique par le système d'exploitation.
-- **Double Redondance** : Sauvegarde miroir continue dans `localStorage` pour une tolérance totale aux pannes.
-- **Sauvegardes & Restauration Complètes** : Exportation d'un dump JSON de la base en 1 clic et réimportation instantanée.
+### 7. 🔐 Comptes et synchronisation
+- Connexion et inscription par courriel avec **Supabase Auth**.
+- Données de chaque compte synchronisées dans Supabase et isolées par utilisateur grâce aux règles Row Level Security.
+- Cache local IndexedDB séparé par compte, en complément de la copie synchronisée en ligne.
+- Exportation des données en JSON depuis l'application.
 
 ---
 
-## 🚀 Comment Lancer le Logiciel ?
+## 🚀 Configuration et lancement
 
-1. Rendez-vous dans le dossier :
-   ```
-   C:\Users\Fall\.gemini\antigravity-ide\scratch\lelapinmalin
-   ```
-2. Double-cliquez simplement sur le fichier **`index.html`**.
-3. Il s'ouvrira immédiatement dans votre navigateur habituel (Google Chrome, Microsoft Edge, Firefox, Brave...).
-4. Des données d'exemples réalistes sont déjà pré-chargées pour vous permettre de découvrir toutes les fonctionnalités immédiatement !
+### Configurer Supabase
+
+1. Créez un projet Supabase et activez le fournisseur d'authentification par courriel.
+2. Dans l'éditeur SQL Supabase, exécutez le contenu de [`supabase-schema.sql`](./supabase-schema.sql). Cette table stocke les données de ferme et ses politiques RLS limitent chaque compte à ses propres données.
+3. Dans [`supabase-config.js`](./supabase-config.js), renseignez l'URL du projet et sa clé publique `anon` (ou `publishable`). **N'utilisez jamais la clé `service_role` dans le navigateur.**
+4. Dans les paramètres Auth de Supabase, configurez l'URL du site et les URL de redirection autorisées pour l'adresse locale et le domaine de production.
+
+### Démarrer l'application
+
+L'authentification nécessite une origine HTTP ; l'ouverture directe de `index.html` avec `file://` ne suffit pas. Depuis le dossier du projet, lancez un serveur local :
+
+```powershell
+py -m http.server 8000
+```
+
+Ouvrez ensuite `http://localhost:8000` dans votre navigateur. Pour un déploiement, publiez les fichiers statiques sur un hébergeur HTTPS et ajoutez son URL aux redirections autorisées Supabase.
+
+Les données déjà présentes dans l'ancienne base locale ne sont pas automatiquement transférées dans les nouveaux comptes.
 
 ---
 
 ## 🎨 Personnalisation & Thèmes
-- Cliquez sur l'icône **Soleil / Lune** en bas du menu latéral pour basculer à tout moment entre le **Mode Sombre** et le **Mode Clair**.
+- Cliquez sur l'icône **Soleil / Lune** sur l'écran de connexion ou en bas du menu latéral pour basculer entre le **Mode Sombre** et le **Mode Clair**. Votre préférence est mémorisée sur cet appareil.
